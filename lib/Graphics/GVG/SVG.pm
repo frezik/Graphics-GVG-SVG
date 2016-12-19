@@ -31,6 +31,43 @@ use namespace::autoclean;
 use SVG;
 
 
+has [qw{ width height }] => (
+    is => 'ro',
+    isa => 'Int',
+    default => 400,
+);
+
+sub make_svg
+{
+    my ($self, $ast) = @_;
+    my $svg = SVG->new(
+        width => $self->width,
+        height => $self->height,
+    );
+    return $svg;
+}
+
+sub _coord_convert_x
+{
+    my ($self, $coord) = @_;
+    return $self->_coord_convert( $coord, $self->width );
+}
+
+sub _coord_convert_y
+{
+    my ($self, $coord) = @_;
+    return $self->_coord_convert( $coord, $self->height );
+}
+
+sub _coord_convert
+{
+    my ($self, $coord, $max) = @_;
+    my $percent = ($coord + 1) / 2;
+    my $final_coord = sprintf '%.0f', $max * $percent;
+    return $final_coord;
+}
+
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
