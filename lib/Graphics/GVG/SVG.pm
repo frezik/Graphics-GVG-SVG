@@ -225,9 +225,52 @@ __END__
 
 =head1 SYNOPSIS
 
+    use Graphics::GVG;
+    use Graphics::GVG::SVG;
+    
+    my $SCRIPT = <<'END';
+        %color = #993399ff;
+        circle( %color, 0.5, 0.25, 0.3 );
+
+        glow {
+            line( %color, 0.25, 0.25, 0.75, 0.75 );
+            line( %color, 0.75, 0.75, 0.75, -0.75 );
+            line( %color, 0.75, -0.75, 0.25, 0.25 );
+        }
+
+        %color = #88aa88ff;
+        poly( %color, -0.25, -0.25, 0.6, 6, 0 );
+    END
+    
+    
+    my $gvg = Graphics::GVG->new;
+    my $ast = $gvg->parse( $SCRIPT );
+    
+    my $gvg_to_svg = Graphics::GVG::SVG->new;
+    my $svg = $gvg_to_svg->make_svg( $ast );
+
 =head1 DESCRIPTION
 
+Takes a L<Graphics::GVG::AST> and converts it into an SVG
+
 =head1 METHODS
+
+=head2 make_svg
+
+  $gvg_to_svg->make_svg( $ast );
+
+Takes a L<Graphics::GVG::AST> object.  Returns the same representation as an 
+L<SVG> object.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Graphics::GVG>
+
+=item * L<SVG>
+
+=back
 
 =head1 LICENSE
 
