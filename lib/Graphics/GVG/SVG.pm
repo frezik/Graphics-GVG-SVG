@@ -44,7 +44,152 @@ sub make_svg
         width => $self->width,
         height => $self->height,
     );
+    my $group = $svg->group(
+        id => 'main_group',
+    );
+    $self->_ast_to_svg( $ast, $group );
+
     return $svg;
+}
+
+sub _ast_to_svg
+{
+    my ($self, $ast, $group) = @_;
+
+    foreach my $cmd (@{ $ast->commands }) {
+        my $ret = '';
+        if(! ref $cmd ) {
+            warn "Not a ref, don't know what to do with '$_'\n";
+        }
+        elsif( $cmd->isa( 'Graphics::GVG::AST::Line' ) ) {
+            $self->_draw_line( $cmd, $group );
+        }
+        elsif( $cmd->isa( 'Graphics::GVG::AST::Rect' ) ) {
+            $self->_draw_rect( $cmd, $group );
+        }
+        elsif( $cmd->isa( 'Graphics::GVG::AST::Polygon' ) ) {
+            $self->_draw_poly( $cmd, $group );
+        }
+        elsif( $cmd->isa( 'Graphics::GVG::AST::Circle' ) ) {
+            $self->_draw_circle( $cmd, $group );
+        }
+        elsif( $cmd->isa( 'Graphics::GVG::AST::Ellipse' ) ) {
+            $self->_draw_ellipse( $cmd, $group );
+        }
+        elsif( $cmd->isa( 'Graphics::GVG::AST::Glow' ) ) {
+            $self->_ast_to_svg( $cmd, $group );
+        }
+        else {
+            warn "Don't know what to do with " . ref($_) . "\n";
+        }
+    }
+
+    return;
+}
+
+sub _draw_line
+{
+    my ($self, $cmd, $group) = @_;
+    $group->line(
+        x1 => $self->_coord_convert_x( $cmd->x1 ),
+        y1 => $self->_coord_convert_y( $cmd->y1 ),
+        x2 => $self->_coord_convert_x( $cmd->x2 ),
+        y2 => $self->_coord_convert_y( $cmd->y2 ),
+        style => {
+            $self->_default_style,
+            stroke => $self->_color_to_style( $cmd->color ),
+        },
+    );
+    return;
+}
+
+sub _draw_rect
+{
+    my ($self, $cmd, $group) = @_;
+    $group->rect(
+        x => $self->_coord_convert_x( $cmd->x ),
+        y => $self->_coord_convert_y( $cmd->y ),
+        width => $self->_coord_convert_x( $cmd->x ),
+        height => $self->_coord_convert_y( $cmd->y ),
+        style => {
+            $self->_default_style,
+            stroke => $self->_color_to_style( $cmd->color ),
+        },
+    );
+    return;
+}
+
+sub _draw_poly
+{
+    my ($self, $cmd, $group) = @_;
+    my (@x_coords, @y_coords);
+    foreach my $coords (@{ $cmd->coords }) {
+        push @x_coords, $self->_coord_convert_x( $coords->[0] );
+        push @y_coords, $self->_coord_convert_y( $coords->[1] );
+    }
+
+    my $points = $group->get_path(
+        x => \@x_coords,
+        y => \@y_coords,
+        -type => 'polygon',
+    );
+    $group->polygon(
+        %$points,
+        style => {
+            $self->_default_style,
+            stroke => $self->_color_to_style( $cmd->color ),
+        },
+    );
+    return;
+}
+
+sub _draw_circle
+{
+    my ($self, $cmd, $group) = @_;
+    $group->circle(
+        cx => $self->_coord_convert_x( $cmd->cx ),
+        cy => $self->_coord_convert_y( $cmd->cy ),
+        # Arbitrarily say the radius is according to the x coord.
+        r => $self->_coord_convert_x( $cmd->r ),
+        style => {
+            $self->_default_style,
+            stroke => $self->_color_to_style( $cmd->color ),
+        },
+    );
+    return;
+}
+
+sub _draw_ellipse
+{
+    my ($self, $cmd, $group) = @_;
+    $group->circle(
+        cx => $self->_coord_convert_x( $cmd->cx ),
+        cy => $self->_coord_convert_y( $cmd->cy ),
+        rx => $self->_coord_convert_x( $cmd->rx ),
+        ry => $self->_coord_convert_y( $cmd->ry ),
+        style => {
+            $self->_default_style,
+            stroke => $self->_color_to_style( $cmd->color ),
+        },
+    );
+    return;
+}
+
+sub _default_style
+{
+    my ($self) = @_;
+    my %style = (
+        fill => 'none',
+    );
+    return %style;
+}
+
+sub _color_to_style
+{
+    my ($self, $color) = @_;
+    my $rgb = $color >> 8;
+    my $hex = sprintf '%x', $rgb;
+    return '#' . $hex;
 }
 
 sub _coord_convert_x

@@ -1,3 +1,4 @@
+#!perl
 # Copyright (c) 2016  Timm Murray
 # All rights reserved.
 # 
@@ -21,46 +22,62 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 6;
 use strict;
 use warnings;
 use Graphics::GVG;
 use Graphics::GVG::SVG;
+use Getopt::Long 'GetOptions';
+
+use constant WIDTH => 400;
+use constant HEIGHT => 400;
 
 
-my $SCRIPT = <<'END';
-    %color = #993399ff;
-    circle( %color, 0.5, 0.25, 0.3 );
+my $GVG_FILE = '';
+GetOptions(
+    'input=s' => \$GVG_FILE,
+);
+die "Need GVG file to show\n" unless $GVG_FILE;
 
-    glow {
-        //%color = #993399ff;
-        line( %color, 0.25, 0.25, 0.75, 0.75 );
-        line( %color, 0.75, 0.75, 0.75, -0.75 );
-        line( %color, 0.75, -0.75, 0.25, 0.25 );
+
+sub make_ast
+{
+    my ($gvg_file) = @_;
+    my $gvg_script = '';
+    open( my $in, '<', $gvg_file ) or die "Can't open $gvg_file: $!\n";
+    while(<$in>) {
+        $gvg_script .= $_;
     }
+    close $in;
 
-    %color = #88aa88ff;
-    poly( %color, -0.25, -0.25, 0.6, 6, 0 );
-END
+    my $gvg_parser = Graphics::GVG->new;
+    my $ast = $gvg_parser->parse( $gvg_script );
+
+    return $ast;
+}
+
+{
+    my $ast = make_ast( $GVG_FILE );
+
+    my $gvg_to_svg = Graphics::GVG::SVG->new;
+    my $svg = $gvg_to_svg->make_svg( $ast );
+
+    print $svg->xmlify;
+}
+__END__
 
 
-my $gvg = Graphics::GVG->new;
-my $ast = $gvg->parse( $SCRIPT );
+=head1 render_svg.pl
 
-my $gvg_to_svg = Graphics::GVG::SVG->new;
-isa_ok( $gvg_to_svg => 'Graphics::GVG::SVG' );
+    render_svg.pl --input circle.gvg 
 
-my $svg = $gvg_to_svg->make_svg( $ast );
-isa_ok( $svg => 'SVG' );
+=head1 DESCRIPTION
 
+Takes a GVG input script and converts it to SVG.
 
-my ($group) = $svg->getFirstChild->getFirstChild;
-cmp_ok( $group->getElementID, 'eq', 'main_group', "Got main_group" );
+=head1 OPTIONS
 
-my @lines = $group->getElements( 'line' );
-my @circles = $group->getElements( 'circle' );
-my @polys = $group->getElements( 'polygon' );
+=head2 --input <circle.gvg>
 
-cmp_ok( scalar @lines, '==', 3, "Lines drawn" );
-cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
-cmp_ok( scalar @polys, '==', 1, "Polygons drawn" );
+Path to the GVG script to use. Required.
+
+=cut
