@@ -1,0 +1,9 @@
+* SVG -> GVG
+    * Attach to Inkscape
+    * Polygons
+    * Glow effect
+    * Point
+    * Rectangle
+    * Parse out color
+    * Documentation
+    * Test round-trip SVG -> GVG -> SVG

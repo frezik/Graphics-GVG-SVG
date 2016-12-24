@@ -28,7 +28,12 @@ use strict;
 use warnings;
 use Moose;
 use namespace::autoclean;
+use Graphics::GVG::AST;
+use Graphics::GVG::AST::Line;
+use Graphics::GVG::AST::Circle;
+use Graphics::GVG::AST::Polygon;
 use SVG;
+use XML::LibXML;
 
 
 has [qw{ width height }] => (
@@ -50,6 +55,88 @@ sub make_svg
     $self->_ast_to_svg( $ast, $group );
 
     return $svg;
+}
+
+sub make_gvg
+{
+    my ($self, $svg_data) = @_;
+    my $xml = XML::LibXML->load_xml( string => $svg_data );
+    my $ast = $self->_svg_to_ast( $xml );
+    return $ast;
+}
+
+sub _svg_to_ast
+{
+    my ($self, $xml) = @_;
+    my $main_group = $xml->getElementById( 'main_group' );
+    my $ast = Graphics::GVG::AST->new;
+
+    $self->_svg_to_ast_handle_lines( $xml, $ast );
+    $self->_svg_to_ast_handle_circles( $xml, $ast );
+    $self->_svg_to_ast_handle_polygons( $xml, $ast );
+
+    return $ast;
+}
+
+sub _svg_to_ast_handle_lines
+{
+    my ($self, $xml, $ast) = @_;
+    my @nodes = $xml->getElementsByTagName( 'line' );
+    
+    foreach my $node (@nodes) {
+        my $cmd = Graphics::GVG::AST::Line->new({
+            x1 => $node->getAttribute( 'x1' ),
+            y1 => $node->getAttribute( 'y1' ),
+            x2 => $node->getAttribute( 'x2' ),
+            y2 => $node->getAttribute( 'y2' ),
+            color => $self->_get_color_for_element( $node ),
+        });
+        $ast->push_command( $cmd );
+    }
+    return;
+}
+
+sub _svg_to_ast_handle_circles
+{
+    my ($self, $xml, $ast) = @_;
+    my @nodes = $xml->getElementsByTagName( 'circle' );
+
+    foreach my $node (@nodes) {
+        my $cmd = Graphics::GVG::AST::Circle->new({
+            cx => $node->getAttribute( 'cx' ),
+            cy => $node->getAttribute( 'cy' ),
+            r => $node->getAttribute( 'r' ),
+            color => $self->_get_color_for_element( $node ),
+        });
+        $ast->push_command( $cmd );
+    }
+    return;
+}
+
+sub _svg_to_ast_handle_polygons
+{
+    my ($self, $xml, $ast) = @_;
+    my @nodes = $xml->getElementsByTagName( 'polygon' );
+
+    foreach my $node (@nodes) {
+        # TODO
+        my $cmd = Graphics::GVG::AST::Polygon->new({
+            cx => 0,
+            cy => 0,
+            r => 0,
+            rotate => 0,
+            color => $self->_get_color_for_element( $node ),
+        });
+        $ast->push_command( $cmd );
+    }
+    return;
+}
+
+sub _get_color_for_element
+{
+    my ($self, $node) = @_;
+    # TODO
+    return 0xffffffff;
 }
 
 sub _ast_to_svg
