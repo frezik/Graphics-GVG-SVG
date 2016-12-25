@@ -1,8 +1,8 @@
 * SVG -> GVG
     * Attach to Inkscape
-    * Polygons
     * Glow effect
     * Point
     * Rectangle
+    * Convert coords
     * Documentation
     * Test round-trip SVG -> GVG -> SVG

@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 7;
+use Test::More tests => 6;
 use strict;
 use warnings;
 use Graphics::GVG::SVG;
@@ -43,11 +43,9 @@ my $ast = $gvg_to_svg->make_gvg( $SVG_DATA );
 my @commands = @{ $ast->commands };
 my @lines = grep { ref($_) eq 'Graphics::GVG::AST::Line' } @commands;
 my @circles = grep { ref($_) eq 'Graphics::GVG::AST::Circle' } @commands;
-my @polys = grep { ref($_) eq 'Graphics::GVG::AST::Polygon' } @commands;
 
-cmp_ok( scalar @lines, '==', 3, "Lines drawn" );
+cmp_ok( scalar @lines, '==', 9, "Lines drawn, with polygon becoming lines" );
 cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
-cmp_ok( scalar @polys, '==', 1, "Polygons drawn" );
 
 cmp_ok( $circles[0]->cx, '==', 300, "Center X of circle set" );
 cmp_ok( $circles[0]->cy, '==', 250, "Center Y of circle set" );

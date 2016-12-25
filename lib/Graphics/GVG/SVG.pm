@@ -119,16 +119,36 @@ sub _svg_to_ast_handle_polygons
     my @nodes = $xml->getElementsByTagName( 'polygon' );
 
     foreach my $node (@nodes) {
-        # TODO
-        my $cmd = Graphics::GVG::AST::Polygon->new({
-            cx => 0,
-            cy => 0,
-            r => 0,
-            rotate => 0,
-            color => $self->_get_color_for_element( $node ),
+        my $color = $self->_get_color_for_element( $node );
+        $self->_svg_convert_polygon_to_lines( $node, $ast );
+    }
+    return;
+}
+
+sub _svg_convert_polygon_to_lines
+{
+    my ($self, $poly, $ast) = @_;
+    my $color = $self->_get_color_for_element( $poly );
+    my $points_str = $poly->getAttribute( 'points' );
+    my @points = split /\s+/, $points_str;
+
+    foreach my $i (0 .. $#points) {
+        my $next_i = $i == $#points
+            ? 0
+            : $i + 1;
+        my ($x1, $y1) = $points[$i] =~ /\A (\d+),(\d+) \z/x;
+        my ($x2, $y2) = $points[$next_i] =~ /\A (\d+),(\d+) \z/x;
+
+        my $cmd = Graphics::GVG::AST::Line->new({
+            x1 => $x1,
+            y1 => $y1,
+            x2 => $x2,
+            y2 => $y2,
+            color => $color,
         });
         $ast->push_command( $cmd );
     }
+
     return;
 }
 
