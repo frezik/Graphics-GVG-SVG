@@ -95,4 +95,11 @@
      x="100"
      y="306"
      class="glow" />
+    <ellipse
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#829abf;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3452"
+       cx="391.42856"
+       cy="453.79077"
+       rx="165.71428"
+       ry="118.57143" />
 </svg>

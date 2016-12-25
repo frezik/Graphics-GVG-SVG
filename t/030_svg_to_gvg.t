@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 15;
+use Test::More tests => 16;
 use strict;
 use warnings;
 use Graphics::GVG::SVG;
@@ -46,11 +46,13 @@ cmp_ok( $gvg_to_svg->height, '==', 400, "Height parsed" );
 my @commands = @{ $ast->commands };
 my @lines = grep { ref($_) eq 'Graphics::GVG::AST::Line' } @commands;
 my @circles = grep { ref($_) eq 'Graphics::GVG::AST::Circle' } @commands;
+my @ellipses = grep { ref($_) eq 'Graphics::GVG::AST::Ellipse' } @commands;
 my @glow = grep { ref($_) eq 'Graphics::GVG::AST::Glow' } @commands;
 
 cmp_ok( scalar @lines, '==', 9, "Lines drawn, with polygon becoming lines" );
 cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
 cmp_ok( scalar @glow, '==', 1, "Glow effects drawn" );
+cmp_ok( scalar @ellipses, '==', 1, "Ellipses drawn" );
 
 cmp_ok( $circles[0]->cx, '==', 0.5, "Center X of circle set" );
 cmp_ok( $circles[0]->cy, '==', 0.25, "Center Y of circle set" );

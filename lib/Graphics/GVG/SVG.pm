@@ -31,6 +31,7 @@ use namespace::autoclean;
 use Graphics::GVG::AST;
 use Graphics::GVG::AST::Line;
 use Graphics::GVG::AST::Circle;
+use Graphics::GVG::AST::Ellipse;
 use Graphics::GVG::AST::Glow;
 use Graphics::GVG::AST::Polygon;
 use Graphics::GVG::AST::Rect;
@@ -94,6 +95,7 @@ sub _svg_to_ast
     $self->_svg_to_ast_handle_circles( $xml, $ast );
     $self->_svg_to_ast_handle_polygons( $xml, $ast );
     $self->_svg_to_ast_handle_rects( $xml, $ast );
+    $self->_svg_to_ast_handle_ellipses( $xml, $ast );
 
     return $ast;
 }
@@ -167,6 +169,26 @@ sub _svg_to_ast_handle_rects
                 $node->getAttribute( 'width' ) ),
             height => $self->_svg_convert_height(
                 $node->getAttribute( 'height' ) ),
+            color => $self->_get_color_for_element( $node ),
+        });
+
+        my $push_to = $self->_svg_decide_type( $ast, $node );
+        $push_to->push_command( $cmd );
+    }
+    return;
+}
+
+sub _svg_to_ast_handle_ellipses
+{
+    my ($self, $xml, $ast) = @_;
+    my @nodes = $xml->getElementsByTagName( 'ellipse' );
+
+    foreach my $node (@nodes) {
+        my $cmd = Graphics::GVG::AST::Ellipse->new({
+            cx => $self->_svg_coord_convert_x( $node->getAttribute( 'cx' ) ),
+            cy => $self->_svg_coord_convert_y( $node->getAttribute( 'cy' ) ),
+            rx => $self->_svg_convert_width( $node->getAttribute( 'rx' ) ),
+            ry => $self->_svg_convert_height( $node->getAttribute( 'ry' ) ),
             color => $self->_get_color_for_element( $node ),
         });
 
