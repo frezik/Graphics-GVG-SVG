@@ -37,10 +37,17 @@ use SVG;
 use XML::LibXML;
 
 
-has [qw{ width height }] => (
+has 'width' => (
     is => 'ro',
     isa => 'Int',
     default => 400,
+    writer => '_set_width',
+);
+has 'height' => (
+    is => 'ro',
+    isa => 'Int',
+    default => 400,
+    writer => '_set_height',
 );
 
 sub make_svg
@@ -62,6 +69,11 @@ sub make_gvg
 {
     my ($self, $svg_data) = @_;
     my $xml = XML::LibXML->load_xml( string => $svg_data );
+
+    my ($svg_tag) = $xml->getElementsByTagName( 'svg' );
+    $self->_set_width( $svg_tag->getAttribute( 'width' ) );
+    $self->_set_height( $svg_tag->getAttribute( 'height' ) );
+
     my $ast = $self->_svg_to_ast( $xml );
     return $ast;
 }
@@ -86,11 +98,15 @@ sub _svg_to_ast_handle_lines
     my @nodes = $xml->getElementsByTagName( 'line' );
     
     foreach my $node (@nodes) {
+        my $x1 = $self->_svg_coord_convert_x( $node->getAttribute( 'x1' ) );
+        my $y1 = $self->_svg_coord_convert_y( $node->getAttribute( 'y1' ) );
+        my $x2 = $self->_svg_coord_convert_x( $node->getAttribute( 'x2' ) );
+        my $y2 = $self->_svg_coord_convert_y( $node->getAttribute( 'y2' ) );
         my $cmd = Graphics::GVG::AST::Line->new({
-            x1 => $node->getAttribute( 'x1' ),
-            y1 => $node->getAttribute( 'y1' ),
-            x2 => $node->getAttribute( 'x2' ),
-            y2 => $node->getAttribute( 'y2' ),
+            x1 => $x1,
+            y1 => $y1,
+            x2 => $x2,
+            y2 => $y2,
             color => $self->_get_color_for_element( $node ),
         });
         $ast->push_command( $cmd );
@@ -105,9 +121,10 @@ sub _svg_to_ast_handle_circles
 
     foreach my $node (@nodes) {
         my $cmd = Graphics::GVG::AST::Circle->new({
-            cx => $node->getAttribute( 'cx' ),
-            cy => $node->getAttribute( 'cy' ),
-            r => $node->getAttribute( 'r' ),
+            cx => $self->_svg_coord_convert_x( $node->getAttribute( 'cx' ) ),
+            cy => $self->_svg_coord_convert_y( $node->getAttribute( 'cy' ) ),
+            # Arbitrarily use width
+            r => $self->_svg_convert_width( $node->getAttribute( 'r' ) ),
             color => $self->_get_color_for_element( $node ),
         });
         $ast->push_command( $cmd );
@@ -134,10 +151,12 @@ sub _svg_to_ast_handle_rects
 
     foreach my $node (@nodes) {
         my $cmd = Graphics::GVG::AST::Rect->new({
-            x => $node->getAttribute( 'x' ),
-            y => $node->getAttribute( 'y' ),
-            width => $node->getAttribute( 'width' ),
-            height => $node->getAttribute( 'height' ),
+            x => $self->_svg_coord_convert_x( $node->getAttribute( 'x' ) ),
+            y => $self->_svg_coord_convert_y( $node->getAttribute( 'y' ) ),
+            width => $self->_svg_convert_width( 
+                $node->getAttribute( 'width' ) ),
+            height => $self->_svg_convert_height(
+                $node->getAttribute( 'height' ) ),
             color => $self->_get_color_for_element( $node ),
         });
         $ast->push_command( $cmd );
@@ -160,10 +179,10 @@ sub _svg_convert_polygon_to_lines
         my ($x2, $y2) = $points[$next_i] =~ /\A (\d+),(\d+) \z/x;
 
         my $cmd = Graphics::GVG::AST::Line->new({
-            x1 => $x1,
-            y1 => $y1,
-            x2 => $x2,
-            y2 => $y2,
+            x1 => $self->_svg_coord_convert_x( $x1 ),
+            y1 => $self->_svg_coord_convert_y( $y1 ),
+            x2 => $self->_svg_coord_convert_x( $x2 ),
+            y2 => $self->_svg_coord_convert_y( $y2 ),
             color => $color,
         });
         $ast->push_command( $cmd );
@@ -336,6 +355,34 @@ sub _coord_convert_y
 {
     my ($self, $coord) = @_;
     return $self->_coord_convert( $coord, $self->height );
+}
+
+sub _svg_coord_convert_x
+{
+    my ($self, $coord) = @_;
+    my $new_coord = (($coord / $self->width) * 2) - 1;
+    return $new_coord;
+}
+
+sub _svg_coord_convert_y
+{
+    my ($self, $coord) = @_;
+    my $new_coord = (($coord / $self->height) * 2) - 1;
+    return $new_coord;
+}
+
+sub _svg_convert_width
+{
+    my ($self, $coord) = @_;
+    my $new_coord = $coord / ($self->width / 2);
+    return $new_coord;
+}
+
+sub _svg_convert_height
+{
+    my ($self, $coord) = @_;
+    my $new_coord = $coord / ($self->height / 2);
+    return $new_coord;
 }
 
 sub _coord_convert

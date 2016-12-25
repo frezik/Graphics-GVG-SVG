@@ -1,6 +1,5 @@
 * SVG -> GVG
     * Attach to Inkscape
     * Glow effect
-    * Convert coords
     * Documentation
     * Test round-trip SVG -> GVG -> SVG

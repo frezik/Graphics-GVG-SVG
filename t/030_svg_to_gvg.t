@@ -49,13 +49,13 @@ cmp_ok( scalar @lines, '==', 9, "Lines drawn, with polygon becoming lines" );
 cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
 cmp_ok( scalar @rects, '==', 1, "Rectangles drawn" );
 
-cmp_ok( $circles[0]->cx, '==', 300, "Center X of circle set" );
-cmp_ok( $circles[0]->cy, '==', 250, "Center Y of circle set" );
-cmp_ok( $circles[0]->r, '==', 260, "Radius of circle set" );
+cmp_ok( $circles[0]->cx, '==', 0.5, "Center X of circle set" );
+cmp_ok( $circles[0]->cy, '==', 0.25, "Center Y of circle set" );
+cmp_ok( $circles[0]->r, '==', 1.3, "Radius of circle set" );
 cmp_ok( $circles[0]->color, '==', 0x993399ff, "Color of circle set" );
 
-cmp_ok( $rects[0]->x, '==', 110, "X coord of rect set" );
-cmp_ok( $rects[0]->y, '==', 306, "Y coord of rect set" );
-cmp_ok( $rects[0]->width, '==', 93, "Width of rect set" );
-cmp_ok( $rects[0]->height, '==', 55, "Height of rect set" );
+cmp_ok( $rects[0]->x, '==', -0.5, "X coord of rect set" );
+cmp_ok( $rects[0]->y, '==', 0.53, "Y coord of rect set" );
+cmp_ok( $rects[0]->width, '==', 0.465, "Width of rect set" );
+cmp_ok( $rects[0]->height, '==', 0.275, "Height of rect set" );
 cmp_ok( $rects[0]->color, '==', 0x829abfff, "Color of rect set" );
