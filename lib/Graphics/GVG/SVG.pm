@@ -135,8 +135,15 @@ sub _svg_to_ast_handle_polygons
 sub _get_color_for_element
 {
     my ($self, $node) = @_;
-    # TODO
-    return 0xffffffff;
+    # There are many ways to set the color in SVG, but Inkscape sets it in 
+    # using the stroke selector using the CSS style attribute. Since we're 
+    # mainly targeting Inkscape, we'll go with that.
+    my $style = $node->getAttribute( 'style' );
+    my ($hex_color) = $style =~ /stroke: \s+ \#([0-9abcdefABCDEF]+)/x;
+    my $color = hex $hex_color;
+    $color <<= 8;
+    $color |= 0x000000ff;
+    return $color;
 }
 
 sub _ast_to_svg

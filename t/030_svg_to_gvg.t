@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 3;
+use Test::More tests => 7;
 use strict;
 use warnings;
 use Graphics::GVG::SVG;
@@ -48,3 +48,8 @@ my @polys = grep { ref($_) eq 'Graphics::GVG::AST::Polygon' } @commands;
 cmp_ok( scalar @lines, '==', 3, "Lines drawn" );
 cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
 cmp_ok( scalar @polys, '==', 1, "Polygons drawn" );
+
+cmp_ok( $circles[0]->cx, '==', 300, "Center X of circle set" );
+cmp_ok( $circles[0]->cy, '==', 250, "Center Y of circle set" );
+cmp_ok( $circles[0]->r, '==', 260, "Radius of circle set" );
+cmp_ok( $circles[0]->color, '==', 0x993399ff, "Color of circle set" );
