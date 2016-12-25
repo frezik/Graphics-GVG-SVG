@@ -72,8 +72,13 @@ sub make_gvg
     my $xml = XML::LibXML->load_xml( string => $svg_data );
 
     my ($svg_tag) = $xml->getElementsByTagName( 'svg' );
-    $self->_set_width( $svg_tag->getAttribute( 'width' ) );
-    $self->_set_height( $svg_tag->getAttribute( 'height' ) );
+    my $width = $svg_tag->getAttribute( 'width' );
+    my $height = $svg_tag->getAttribute( 'height' );
+    # Ignore units
+    ($width) = $width =~ /\A(\d+)/x;
+    ($height) = $height =~ /\A(\d+)/x;
+    $self->_set_width( $width );
+    $self->_set_height( $height );
 
     my $ast = $self->_svg_to_ast( $xml );
     return $ast;

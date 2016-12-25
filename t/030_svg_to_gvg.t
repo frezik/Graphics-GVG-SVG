@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 13;
+use Test::More tests => 15;
 use strict;
 use warnings;
 use Graphics::GVG::SVG;
@@ -39,6 +39,9 @@ close $in;
 
 my $gvg_to_svg = Graphics::GVG::SVG->new;
 my $ast = $gvg_to_svg->make_gvg( $SVG_DATA );
+
+cmp_ok( $gvg_to_svg->width, '==', 400, "Width parsed" );
+cmp_ok( $gvg_to_svg->height, '==', 400, "Height parsed" );
 
 my @commands = @{ $ast->commands };
 my @lines = grep { ref($_) eq 'Graphics::GVG::AST::Line' } @commands;

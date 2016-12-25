@@ -24,5 +24,33 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use Graphics::GVG;
+use Graphics::GVG::SVG;
 
-die "Argv: @ARGV\n";
+my $INPUT_SVG_FILE = shift or die "Need input SVG file\n";
+die "Input file $INPUT_SVG_FILE does not exist\n" if ! -e $INPUT_SVG_FILE;
+
+
+sub get_file
+{
+    my ($file) = @_;
+
+    open( my $in, '<', $file ) or die "Can't open $file: $!\n";
+    my $contents = '';
+    while( <$in> ) {
+        $contents .= $_;
+    }
+    close $in;
+
+    return $contents;
+}
+
+
+{
+    my $svg_contents = get_file( $INPUT_SVG_FILE );
+
+    my $svg_to_gvg = Graphics::GVG::SVG->new;
+    my $ast = $svg_to_gvg->make_gvg( $svg_contents );
+
+    print $ast->to_string;
+}
