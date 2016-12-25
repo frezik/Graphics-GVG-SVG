@@ -32,6 +32,7 @@ use Graphics::GVG::AST;
 use Graphics::GVG::AST::Line;
 use Graphics::GVG::AST::Circle;
 use Graphics::GVG::AST::Polygon;
+use Graphics::GVG::AST::Rect;
 use SVG;
 use XML::LibXML;
 
@@ -74,6 +75,7 @@ sub _svg_to_ast
     $self->_svg_to_ast_handle_lines( $xml, $ast );
     $self->_svg_to_ast_handle_circles( $xml, $ast );
     $self->_svg_to_ast_handle_polygons( $xml, $ast );
+    $self->_svg_to_ast_handle_rects( $xml, $ast );
 
     return $ast;
 }
@@ -125,6 +127,24 @@ sub _svg_to_ast_handle_polygons
     return;
 }
 
+sub _svg_to_ast_handle_rects
+{
+    my ($self, $xml, $ast) = @_;
+    my @nodes = $xml->getElementsByTagName( 'rect' );
+
+    foreach my $node (@nodes) {
+        my $cmd = Graphics::GVG::AST::Rect->new({
+            x => $node->getAttribute( 'x' ),
+            y => $node->getAttribute( 'y' ),
+            width => $node->getAttribute( 'width' ),
+            height => $node->getAttribute( 'height' ),
+            color => $self->_get_color_for_element( $node ),
+        });
+        $ast->push_command( $cmd );
+    }
+    return;
+}
+
 sub _svg_convert_polygon_to_lines
 {
     my ($self, $poly, $ast) = @_;
@@ -159,7 +179,7 @@ sub _get_color_for_element
     # using the stroke selector using the CSS style attribute. Since we're 
     # mainly targeting Inkscape, we'll go with that.
     my $style = $node->getAttribute( 'style' );
-    my ($hex_color) = $style =~ /stroke: \s+ \#([0-9abcdefABCDEF]+)/x;
+    my ($hex_color) = $style =~ /stroke: \s* \#([0-9abcdefABCDEF]+)/x;
     my $color = hex $hex_color;
     $color <<= 8;
     $color |= 0x000000ff;

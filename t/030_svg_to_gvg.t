@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 6;
+use Test::More tests => 12;
 use strict;
 use warnings;
 use Graphics::GVG::SVG;
@@ -43,11 +43,19 @@ my $ast = $gvg_to_svg->make_gvg( $SVG_DATA );
 my @commands = @{ $ast->commands };
 my @lines = grep { ref($_) eq 'Graphics::GVG::AST::Line' } @commands;
 my @circles = grep { ref($_) eq 'Graphics::GVG::AST::Circle' } @commands;
+my @rects = grep { ref($_) eq 'Graphics::GVG::AST::Rect' } @commands;
 
 cmp_ok( scalar @lines, '==', 9, "Lines drawn, with polygon becoming lines" );
 cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
+cmp_ok( scalar @rects, '==', 1, "Rectangles drawn" );
 
 cmp_ok( $circles[0]->cx, '==', 300, "Center X of circle set" );
 cmp_ok( $circles[0]->cy, '==', 250, "Center Y of circle set" );
 cmp_ok( $circles[0]->r, '==', 260, "Radius of circle set" );
 cmp_ok( $circles[0]->color, '==', 0x993399ff, "Color of circle set" );
+
+cmp_ok( $rects[0]->x, '==', 110, "X coord of rect set" );
+cmp_ok( $rects[0]->y, '==', 306, "Y coord of rect set" );
+cmp_ok( $rects[0]->width, '==', 93, "Width of rect set" );
+cmp_ok( $rects[0]->height, '==', 55, "Height of rect set" );
+cmp_ok( $rects[0]->color, '==', 0x829abfff, "Color of rect set" );
