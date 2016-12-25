@@ -31,6 +31,7 @@ use namespace::autoclean;
 use Graphics::GVG::AST;
 use Graphics::GVG::AST::Line;
 use Graphics::GVG::AST::Circle;
+use Graphics::GVG::AST::Glow;
 use Graphics::GVG::AST::Polygon;
 use Graphics::GVG::AST::Rect;
 use SVG;
@@ -109,7 +110,9 @@ sub _svg_to_ast_handle_lines
             y2 => $y2,
             color => $self->_get_color_for_element( $node ),
         });
-        $ast->push_command( $cmd );
+
+        my $push_to = $self->_svg_decide_type( $ast, $node );
+        $push_to->push_command( $cmd );
     }
     return;
 }
@@ -127,7 +130,9 @@ sub _svg_to_ast_handle_circles
             r => $self->_svg_convert_width( $node->getAttribute( 'r' ) ),
             color => $self->_get_color_for_element( $node ),
         });
-        $ast->push_command( $cmd );
+
+        my $push_to = $self->_svg_decide_type( $ast, $node );
+        $push_to->push_command( $cmd );
     }
     return;
 }
@@ -159,7 +164,9 @@ sub _svg_to_ast_handle_rects
                 $node->getAttribute( 'height' ) ),
             color => $self->_get_color_for_element( $node ),
         });
-        $ast->push_command( $cmd );
+
+        my $push_to = $self->_svg_decide_type( $ast, $node );
+        $push_to->push_command( $cmd );
     }
     return;
 }
@@ -185,10 +192,30 @@ sub _svg_convert_polygon_to_lines
             y2 => $self->_svg_coord_convert_y( $y2 ),
             color => $color,
         });
-        $ast->push_command( $cmd );
+
+        my $push_to = $self->_svg_decide_type( $ast, $poly );
+        $push_to->push_command( $cmd );
     }
 
     return;
+}
+
+sub _svg_decide_type
+{
+    my ($self, $ast, $node) = @_;
+    my $class = $node->getAttribute( 'class' );
+    return $ast if ! defined $class;
+
+    my $type = $ast;
+    my %classes = map { $_ => 1 }
+        split /\s+/, $class;
+
+    if( exists $classes{glow} ) {
+        $type = Graphics::GVG::AST::Glow->new;
+        $ast->push_command( $type );
+    }
+
+    return $type;
 }
 
 sub _get_color_for_element
