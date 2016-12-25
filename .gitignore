@@ -1,2 +1,3 @@
 *.svg
+!t_data/*.svg
 .build
