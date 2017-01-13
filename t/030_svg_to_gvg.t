@@ -56,7 +56,7 @@ cmp_ok( scalar @ellipses, '==', 1, "Ellipses drawn" );
 
 cmp_ok( $circles[0]->cx, '==', 0.5, "Center X of circle set" );
 cmp_ok( $circles[0]->cy, '==', 0.25, "Center Y of circle set" );
-cmp_ok( $circles[0]->r, '==', 1.3, "Radius of circle set" );
+cmp_ok( $circles[0]->r, '==', 0.3, "Radius of circle set" );
 cmp_ok( $circles[0]->color, '==', 0x993399ff, "Color of circle set" );
 
 my @rects = grep { ref($_) eq 'Graphics::GVG::AST::Rect' }

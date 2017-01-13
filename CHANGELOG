@@ -1,5 +1,9 @@
 Revision history for perl module Graphics::GVG::SVG
 
+0.3 2017-??-??
+
+- Do circle radius coord conversions correctly
+
 0.2 2016-12-25
 
 - Inkscape extension

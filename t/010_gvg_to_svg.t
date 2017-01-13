@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 6;
+use Test::More tests => 7;
 use strict;
 use warnings;
 use Graphics::GVG;
@@ -64,3 +64,6 @@ my @polys = $group->getElements( 'polygon' );
 cmp_ok( scalar @lines, '==', 3, "Lines drawn" );
 cmp_ok( scalar @circles, '==', 1, "Circles drawn" );
 cmp_ok( scalar @polys, '==', 1, "Polygons drawn" );
+
+cmp_ok( $circles[0]->getAttribute( 'r' ), '==', 60,
+    "Circle has correct radius" );

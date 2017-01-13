@@ -357,7 +357,7 @@ sub _draw_circle
         cx => $self->_coord_convert_x( $cmd->cx ),
         cy => $self->_coord_convert_y( $cmd->cy ),
         # Arbitrarily say the radius is according to the x coord.
-        r => $self->_coord_convert_x( $cmd->r ),
+        r => $self->_coord_convert_abs( $cmd->r, $self->width / 2 ),
         style => {
             $self->_default_style,
             stroke => $self->_color_to_style( $cmd->color ),
@@ -409,6 +409,12 @@ sub _coord_convert_y
 {
     my ($self, $coord) = @_;
     return $self->_coord_convert( $coord, $self->height );
+}
+
+sub _coord_convert_abs
+{
+    my ($self, $coord, $total_size) = @_;
+    return $coord * $total_size;
 }
 
 sub _svg_coord_convert_x
