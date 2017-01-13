@@ -1,8 +1,9 @@
 Revision history for perl module Graphics::GVG::SVG
 
-0.3 2017-??-??
+0.3 2017-01-13
 
 - Do circle radius coord conversions correctly
+- Y coord no longer flipped
 
 0.2 2016-12-25
 

@@ -32,16 +32,16 @@ my $svg = Graphics::GVG::SVG->new({
 });
 
 cmp_ok( $svg->_coord_convert_x( -1 ), '==', 0, "Convert X -1" );
-cmp_ok( $svg->_coord_convert_y( -1 ), '==', 0, "Convert Y -1" );
+cmp_ok( $svg->_coord_convert_y( -1 ), '==', 200, "Convert Y -1" );
 
 cmp_ok( $svg->_coord_convert_x( 1 ), '==', 100, "Convert X 1" );
-cmp_ok( $svg->_coord_convert_y( 1 ), '==', 200, "Convert Y 1" );
+cmp_ok( $svg->_coord_convert_y( 1 ), '==', 0, "Convert Y 1" );
 
 cmp_ok( $svg->_coord_convert_x( 0 ), '==', 50, "Convert X 0" );
 cmp_ok( $svg->_coord_convert_y( 0 ), '==', 100, "Convert Y 0" );
 
 cmp_ok( $svg->_coord_convert_x( 0.75 ), '==', 88, "Convert X 0.75" );
-cmp_ok( $svg->_coord_convert_y( 0.75 ), '==', 175, "Convert Y 0.75" );
+cmp_ok( $svg->_coord_convert_y( 0.75 ), '==', 25, "Convert Y 0.75" );
 
 cmp_ok( $svg->_coord_convert_x( -0.75 ), '==', 12, "Convert X -0.75" );
-cmp_ok( $svg->_coord_convert_y( -0.75 ), '==', 25, "Convert Y -0.75" );
+cmp_ok( $svg->_coord_convert_y( -0.75 ), '==', 175, "Convert Y -0.75" );

@@ -408,7 +408,7 @@ sub _coord_convert_x
 sub _coord_convert_y
 {
     my ($self, $coord) = @_;
-    return $self->_coord_convert( $coord, $self->height );
+    return $self->_coord_convert( -$coord, $self->height );
 }
 
 sub _coord_convert_abs
