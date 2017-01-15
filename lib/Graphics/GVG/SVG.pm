@@ -408,7 +408,9 @@ sub _coord_convert_x
 sub _coord_convert_y
 {
     my ($self, $coord) = @_;
-    return $self->_coord_convert( -$coord, $self->height );
+    my $normalized_coord = (-($coord - 1)) / 2;
+    my $final_coord = sprintf '%.0f', $self->height * $normalized_coord;
+    return $final_coord;
 }
 
 sub _coord_convert_abs
@@ -427,7 +429,8 @@ sub _svg_coord_convert_x
 sub _svg_coord_convert_y
 {
     my ($self, $coord) = @_;
-    my $new_coord = (($coord / $self->height) * 2) - 1;
+    my $half_height = $self->height / 2;
+    my $new_coord = -(($coord - $half_height) / $half_height);
     return $new_coord;
 }
 
